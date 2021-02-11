@@ -78,7 +78,7 @@ DEFINE ret_direccion_sum		char(200);
 		-- validar la barra
 		LET len_barra= LENGTH(valor_busqueda);
 		IF (len_barra != 46) THEN
-			RETURN 105, 'Longitud de barra incorrecto','', '', 0, '', '', '', '', '', '', '' ;
+			RETURN '105', 'Longitud de barra incorrecto','', '', 0, '', '', '', '', '', '', '' ;
 		END IF;
 		
 		LET empresa_barra=valor_busqueda[1,3];
@@ -106,7 +106,7 @@ DEFINE ret_direccion_sum		char(200);
 			IF (tipo_mov_barra != '06') THEN
 				IF (tipo_mov_barra != '10') THEN
 					IF (tipo_mov_barra != '96') THEN
-						RETURN 105, 'Tipo de barra incorrecto','', '', 0, '', '', '', '', '', '', '' ;
+						RETURN '105', 'Tipo de barra incorrecto','', '', 0, '', '', '', '', '', '', '' ;
 					END IF;
 				END IF;
 			END IF;
@@ -116,19 +116,19 @@ DEFINE ret_direccion_sum		char(200);
 		EXECUTE PROCEDURE sp_rdd_devuelve_dv(barra_aux1) INTO dv_barra_aux1;
 		
 		IF dv_barra != dv_barra_aux1 THEN
-			RETURN 105, 'Digito Verificador de barra incorrecto','', '', 0, '', '', '', '', '', '', '' ;
+			RETURN '105', 'Digito Verificador de barra incorrecto','', '', 0, '', '', '', '', '', '', '' ;
 		END IF;
 		
 		LET ret_cod_barra=valor_busqueda;
 		LET ret_tipo_deuda='BAR';
 		LET ret_monto_deuda=to_char(fMonto);
 		LET ret_tipo_documento=tipo_mov_barra;
-		LET ret_nro_documento='008080'; -- despues levantarlo del documento
-		LET ret_fecha_emision=to_char(dFechaVcto1, '%d/%m/%Y'); -- despues levantarlo del documento
+		--LET ret_nro_documento='008080'; -- despues levantarlo del documento
+		--LET ret_fecha_emision=to_char(dFechaVcto1, '%d/%m/%Y'); -- despues levantarlo del documento
 		LET ret_fecha_vencimiento=to_char(dFechaVcto1, '%d/%m/%Y');
 		
 	ELSE
-		RETURN 1, 'Parametro -tipo_busqueda- invalido.','', '', 0, '', '', '', '', '', '', '' ;
+		RETURN '1', 'Parametro -tipo_busqueda- invalido.','', '', 0, '', '', '', '', '', '', '' ;
 	END IF; 
 
 	-- ver que el cliente exista
@@ -154,7 +154,7 @@ DEFINE ret_direccion_sum		char(200);
 
 	LET nrows = DBINFO('sqlca.sqlerrd2');
 	IF nrows = 0 THEN
-		RETURN 1, 'Cliente No Existe.','', '', 0, '', '', '', '', '', '', '' ;
+		RETURN '1', 'Cliente No Existe.','', '', 0, '', '', '', '', '', '', '' ;
 	END IF;
 	
 	LET ret_nombre_cliente=cli_nombre;
@@ -162,18 +162,18 @@ DEFINE ret_direccion_sum		char(200);
 	LET ret_direccion_sum= 'Calle ' || cli_calle || ' ' || cli_altura || ' Piso ' || cli_piso || ' Dpto ' || cli_depto || ' Partido ' || cli_partido || ' Comuna ' || cli_comuna;
 	-- ver que tenga deuda 
 	IF cli_saldo <= 0 THEN
-		RETURN 1, 'Cliente No Posee Deuda.','', '', 0, '', '', '', '', '', '', '' ;
+		RETURN '1', 'Cliente No Posee Deuda.','', '', 0, '', '', '', '', '', '', '' ;
 	END IF;
 	
 	-- ver el tipo cliente
 	IF cli_tipo_cliente = 'OM' THEN
-		RETURN 1, 'Cliente es Oficial.','', '', 0, '', '', '', '', '', '', '' ;
+		RETURN '1', 'Cliente es Oficial.','', '', 0, '', '', '', '', '', '', '' ;
 	ELIF cli_tipo_cliente = 'OP' THEN
-		RETURN 1, 'Cliente es Oficial.','', '', 0, '', '', '', '', '', '', '' ;
+		RETURN '1', 'Cliente es Oficial.','', '', 0, '', '', '', '', '', '', '' ;
 	ELIF cli_tipo_cliente = 'ON' THEN
-		RETURN 1, 'Cliente es Oficial.','', '', 0, '', '', '', '', '', '', '' ;
+		RETURN '1', 'Cliente es Oficial.','', '', 0, '', '', '', '', '', '', '' ;
 	ELIF cli_tipo_cliente = 'AP' THEN
-		RETURN 1, 'Cliente es Oficial.','', '', 0, '', '', '', '', '', '', '' ;
+		RETURN '1', 'Cliente es Oficial.','', '', 0, '', '', '', '', '', '', '' ;
 	END IF;	
 	
 	-- Ver lo del estado de cobrabilidad
@@ -189,10 +189,12 @@ DEFINE ret_direccion_sum		char(200);
 		LET ret_tipo_documento='06';
 	ELSE
 		-- en este caso, tengo que recuperar el documento origen de la barra.
+		EXECUTE PROCEDURE rdd_get_documento(nro_cliente, valor_busqueda) INTO ret_monto_deuda, ret_nro_documento, ret_fecha_emision, ret_fecha_vencimiento;
 		
+		LET ret_tipo_deuda='BAR';
 	END IF
 	
-	RETURN 0, 'OK', ret_cod_barra, ret_tipo_deuda, ret_monto_deuda, ret_tipo_documento, ret_nro_documento, ret_fecha_emision, ret_fecha_vencimiento, ret_nombre_cliente, ret_estado_cliente, ret_direccion_sum;
+	RETURN '0', 'OK', ret_cod_barra, ret_tipo_deuda, ret_monto_deuda, ret_tipo_documento, ret_nro_documento, ret_fecha_emision, ret_fecha_vencimiento, ret_nombre_cliente, ret_estado_cliente, ret_direccion_sum;
 
 END PROCEDURE;
 
