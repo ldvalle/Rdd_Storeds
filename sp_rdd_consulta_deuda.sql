@@ -58,6 +58,8 @@ DEFINE cli_comuna			char(25);
 DEFINE len_barra			int;
 DEFINE nrows				int;
 
+DEFINE cod_gd				char(3);
+DEFINE descri_gd			char(100);
 -- Valores a devolver
 DEFINE ret_cod_barra 	char(46);
 DEFINE ret_tipo_deuda	char(5);
@@ -186,10 +188,14 @@ DEFINE ret_direccion_sum		char(200);
 		EXECUTE PROCEDURE rdd_get_ultifactu(nro_cliente) INTO ret_cod_barra, ret_monto_deuda, ret_nro_documento, ret_fecha_emision, ret_fecha_vencimiento;
 		
 		LET ret_tipo_deuda='UF';
-		LET ret_tipo_documento='06';
+		LET ret_tipo_documento=ret_cod_barra[44,45];
 	ELSE
 		-- en este caso, tengo que recuperar el documento origen de la barra.
-		EXECUTE PROCEDURE rdd_get_documento(nro_cliente, valor_busqueda) INTO ret_monto_deuda, ret_nro_documento, ret_fecha_emision, ret_fecha_vencimiento;
+		EXECUTE PROCEDURE rdd_get_documento(valor_busqueda) INTO cod_gd, descri_gd, ret_monto_deuda, ret_nro_documento, ret_fecha_emision, ret_fecha_vencimiento;
+		
+		IF cod_gd != '0' THEN
+			RETURN cod_gd, descri_gd,'', '', 0, '', '', '', '', '', '', '' ;
+		END IF;
 		
 		LET ret_tipo_deuda='BAR';
 	END IF
