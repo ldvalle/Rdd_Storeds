@@ -1,21 +1,24 @@
 drop procedure rdd_consulta_deuda;
 
 CREATE PROCEDURE rdd_consulta_deuda(
+codigo_empresa      integer,
 tipo_busqueda		char(25),
 valor_busqueda		char(100),
 codigo_recaudador	char(20))
 RETURNING char(3) as codigo_retorno, 
-	char(250) as descripcion_retorno, 
+	char(50) as descripcion_retorno, 
 	char(46) as cod_barra, 
 	char(5) as tipo_deuda, 
-	float as monto_deuda,
+	decimal(12,2) as monto_deuda,
 	char(2) as tipo_documento,
 	char(12) as nro_documento,
 	char(10) as fecha_emision,
 	char(10) as fecha_vencimiento,
 	char(100) as nombre_cliente,
 	char(1) as estado_cliente,
-	char(200) as direccion;
+	char(80) as direccion,
+    char(10) as mensaje,
+    char(10) as publicidad;
 
 DEFINE numero_suministro char(8);
 
@@ -40,6 +43,7 @@ DEFINE dFechaVcto2			date;
 DEFINE sFechaVcto2			char(6);
 DEFINE fMonto				float;
 DEFINE fRecargo				float;
+DEFINE barra_corr_factu     integer;
 
 DEFINE cli_nombre			char(40);
 DEFINE cli_estado_cliente	integer;
@@ -60,6 +64,8 @@ DEFINE nrows				int;
 
 DEFINE cod_gd				char(3);
 DEFINE descri_gd			char(100);
+DEFINE tope_recauda         decimal(12,2);
+
 -- Valores a devolver
 DEFINE ret_cod_barra 	char(46);
 DEFINE ret_tipo_deuda	char(5);
@@ -72,7 +78,10 @@ DEFINE ret_nombre_cliente		char(100);
 DEFINE ret_estado_cliente		char(1);
 DEFINE ret_direccion_sum		char(200);
 
-
+    IF codigo_empresa != 4 THEN
+        RETURN '013', 'EMPRESA INVALIDA','', '', 0, '', '', '', '', '', '', '', '', '';
+    END IF;
+    
 	IF trim(tipo_busqueda) = 'nro_suministro' THEN
 		LET nro_cliente = TO_NUMBER(valor_busqueda);
 		
@@ -80,7 +89,7 @@ DEFINE ret_direccion_sum		char(200);
 		-- validar la barra
 		LET len_barra= LENGTH(valor_busqueda);
 		IF (len_barra != 46) THEN
-			RETURN '105', 'Longitud de barra incorrecto','', '', 0, '', '', '', '', '', '', '' ;
+			RETURN '105', 'Longitud de barra incorrecto','', '', 0, '', '', '', '', '', '', '', '', '';
 		END IF;
 		
 		LET empresa_barra=valor_busqueda[1,3];
@@ -103,22 +112,24 @@ DEFINE ret_direccion_sum		char(200);
 		
 		LET fMonto = (TO_NUMBER(importe_barra)/100);
 		LET fRecargo = (TO_NUMBER(recargo_barra)/100);
+        LET barra_corr_factu = TO_NUMBER(corr_factu_barra);
 		
 		IF (tipo_mov_barra != '05') THEN
 			IF (tipo_mov_barra != '06') THEN
 				IF (tipo_mov_barra != '10') THEN
 					IF (tipo_mov_barra != '96') THEN
-						RETURN '105', 'Tipo de barra incorrecto','', '', 0, '', '', '', '', '', '', '' ;
+						RETURN '105', 'Tipo de barra incorrecto','', '', 0, '', '', '', '', '', '', '', '', '';
 					END IF;
 				END IF;
 			END IF;
 		END IF;
 	
+        
 		LET barra_aux1=valor_busqueda[1,45];
 		EXECUTE PROCEDURE sp_rdd_devuelve_dv(barra_aux1) INTO dv_barra_aux1;
 		
 		IF dv_barra != dv_barra_aux1 THEN
-			RETURN '105', 'Digito Verificador de barra incorrecto','', '', 0, '', '', '', '', '', '', '' ;
+			RETURN '105', 'Digito Verificador de barra incorrecto','', '', 0, '', '', '', '', '', '', '', '', '';
 		END IF;
 		
 		LET ret_cod_barra=valor_busqueda;
@@ -130,7 +141,7 @@ DEFINE ret_direccion_sum		char(200);
 		LET ret_fecha_vencimiento=to_char(dFechaVcto1, '%d/%m/%Y');
 		
 	ELSE
-		RETURN '1', 'Parametro -tipo_busqueda- invalido.','', '', 0, '', '', '', '', '', '', '' ;
+		RETURN '008', 'TIPO DE BUSQUEDA INCORRECTO.','', '', 0, '', '', '', '', '', '', '', '', '';
 	END IF; 
 
 	-- ver que el cliente exista
@@ -156,32 +167,37 @@ DEFINE ret_direccion_sum		char(200);
 
 	LET nrows = DBINFO('sqlca.sqlerrd2');
 	IF nrows = 0 THEN
-		RETURN '1', 'Cliente No Existe.','', '', 0, '', '', '', '', '', '', '' ;
+		RETURN '003', 'Cliente/Barra no existe.','', '', 0, '', '', '', '', '', '', '', '', '';
 	END IF;
 	
+    IF trim(tipo_busqueda) = 'cod_barra' THEN
+        IF tipo_mov_barra = '06' OR tipo_mov_barra = '96' THEN
+            IF barra_corr_factu != cli_corr_factu THEN
+                RETURN '021', 'CLIENTE COMUNICARSE CON ATE.COMERCIAL ENEL','', '', 0, '', '', '', '', '', '', '', '', '';
+            END IF;
+        END IF;
+    END IF;
+
 	LET ret_nombre_cliente=cli_nombre;
 	LET ret_estado_cliente=cli_estado_cliente;
-	LET ret_direccion_sum= 'Calle ' || cli_calle || ' ' || cli_altura || ' Piso ' || cli_piso || ' Dpto ' || cli_depto || ' Partido ' || cli_partido || ' Comuna ' || cli_comuna;
+	LET ret_direccion_sum= 'Calle ' || trim(cli_calle) || ' ' || trim(cli_altura) || ' Piso ' || trim(cli_piso) || ' Dpto ' || trim(cli_depto) || ' Partido ' || trim(cli_partido) || ' Comuna ' || trim(cli_comuna);
 	-- ver que tenga deuda 
 	IF cli_saldo <= 0 THEN
-		RETURN '1', 'Cliente No Posee Deuda.','', '', 0, '', '', '', '', '', '', '' ;
+		RETURN '005', 'SIN DEUDA VIGENTE.','', '', 0, '', '', '', '', '', '', '', '', '';
 	END IF;
 	
 	-- ver el tipo cliente
 	IF cli_tipo_cliente = 'OM' THEN
-		RETURN '1', 'Cliente es Oficial.','', '', 0, '', '', '', '', '', '', '' ;
+		RETURN '021', 'CLIENTE COMUNICARSE CON ATE.COMERCIAL ENEL','', '', 0, '', '', '', '', '', '', '', '', '';
 	ELIF cli_tipo_cliente = 'OP' THEN
-		RETURN '1', 'Cliente es Oficial.','', '', 0, '', '', '', '', '', '', '' ;
+		RETURN '021', 'CLIENTE COMUNICARSE CON ATE.COMERCIAL ENEL','', '', 0, '', '', '', '', '', '', '', '', '';
 	ELIF cli_tipo_cliente = 'ON' THEN
-		RETURN '1', 'Cliente es Oficial.','', '', 0, '', '', '', '', '', '', '' ;
+		RETURN '021', 'CLIENTE COMUNICARSE CON ATE.COMERCIAL ENEL','', '', 0, '', '', '', '', '', '', '', '', '';
 	ELIF cli_tipo_cliente = 'AP' THEN
-		RETURN '1', 'Cliente es Oficial.','', '', 0, '', '', '', '', '', '', '' ;
+		RETURN '021', 'CLIENTE COMUNICARSE CON ATE.COMERCIAL ENEL','', '', 0, '', '', '', '', '', '', '', '', '';
 	END IF;	
 	
 	-- Ver lo del estado de cobrabilidad
-	
-	-- ver lo del ente recaudador
-	
 	
 	IF trim(tipo_busqueda) = 'nro_suministro' THEN
 		-- en este caso tengo que levantar la ultima factura.
@@ -194,13 +210,30 @@ DEFINE ret_direccion_sum		char(200);
 		EXECUTE PROCEDURE rdd_get_documento(valor_busqueda) INTO cod_gd, descri_gd, ret_monto_deuda, ret_nro_documento, ret_fecha_emision, ret_fecha_vencimiento;
 		
 		IF cod_gd != '0' THEN
-			RETURN cod_gd, descri_gd,'', '', 0, '', '', '', '', '', '', '' ;
+			RETURN cod_gd, descri_gd,'', '', 0, '', '', '', '', '', '', '', '', '';
 		END IF;
 		
 		LET ret_tipo_deuda='BAR';
 	END IF
+
+	-- ver lo del ente recaudador
+    SELECT monto_tope INTO tope_recauda FROM rdd_recaudadores
+    WHERE cod_recaudador = codigo_recaudador
+    AND tarifa = 'T1'
+    AND tipo_documento = ret_tipo_documento
+    AND fecha_activacion <= TODAY
+    AND (fecha_desactivac IS NULL OR fecha_desactivac > TODAY);
+
+	LET nrows = DBINFO('sqlca.sqlerrd2');
+	IF nrows = 0 THEN
+		RETURN '010', 'RECAUDADOR INVALIDO.','', '', 0, '', '', '', '', '', '', '', '', '';
+	END IF;
 	
-	RETURN '0', 'OK', ret_cod_barra, ret_tipo_deuda, ret_monto_deuda, ret_tipo_documento, ret_nro_documento, ret_fecha_emision, ret_fecha_vencimiento, ret_nombre_cliente, ret_estado_cliente, ret_direccion_sum;
+    IF ret_monto_deuda > tope_recauda THEN
+        RETURN '021', 'CLIENTE COMUNICARSE CON ATE.COMERCIAL ENEL','', '', 0, '', '', '', '', '', '', '', '', '';
+    END IF;
+    
+	RETURN '0', 'OK', ret_cod_barra, ret_tipo_deuda, round(ret_monto_deuda,2), ret_tipo_documento, ret_nro_documento, ret_fecha_emision, ret_fecha_vencimiento, ret_nombre_cliente, ret_estado_cliente, ret_direccion_sum, '', '';
 
 END PROCEDURE;
 
