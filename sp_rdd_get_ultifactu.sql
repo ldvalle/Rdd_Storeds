@@ -1,3 +1,5 @@
+drop procedure rdd_get_ultifactu;
+
 CREATE PROCEDURE rdd_get_ultifactu(nro_cliente int)
 RETURNING char(46) as barra, float as monto, char(12) as nro_documento, char(10) as fecha_emision, char(10) as fecha_vcto; 
 
@@ -36,7 +38,7 @@ DEFINE nrows			int;
 
 
 	SELECT TODAY, h.corr_facturacion, h.centro_emisor, h.tipo_docto, h.numero_factura, 
-	h.total_a_pagar, h.suma_recargo, h.fecha_facturacion, h.fecha_vencimiento1, h.fecha_vencimiento2,
+	h.total_a_pagar, round(h.suma_recargo,2), h.fecha_facturacion, h.fecha_vencimiento1, h.fecha_vencimiento2,
 	LPAD(c.numero_cliente, 8, '0'), c.sucursal[3,4], LPAD(c.sector, 2, '0'), h.saldo_anterior
 	INTO h_fecha_actual, h_corr_factu, h_centro_emisor, h_tipo_docto, h_nro_factura,
 		h_total_a_pagar, h_suma_recargo, h_fecha_facturacion, h_fecha_vcto1, h_fecha_vcto2,
@@ -57,7 +59,7 @@ DEFINE nrows			int;
 		WHERE numero_cliente = nro_cliente
 		AND corr_fact = h_corr_factu;
 	
-		LET recargo_barra=NVL(r_suma_recargo, 0);
+		LET recargo_barra=round(r_suma_recargo, 2);
 	ELSE
 		LET recargo_barra=h_suma_recargo;
 	END IF;
@@ -72,13 +74,13 @@ DEFINE nrows			int;
 			LET ret_monto_deuda=h_total_a_pagar + NVL(r_suma_recargo, 0);
 			LET ret_fecha_vencimiento= to_char(h_fecha_vcto2, '%d/%m/%Y');
 			LET nvoMontoBarra=h_total_a_pagar;
-			LET nvoRecargoBarra=0;			
+			LET nvoRecargoBarra=recargo_barra;			
 		END IF;
 	ELSE
 		LET ret_monto_deuda=h_total_a_pagar;
 		LET ret_fecha_vencimiento= to_char(h_fecha_vcto1, '%d/%m/%Y');
 		LET nvoMontoBarra=h_total_a_pagar;
-		LET nvoRecargoBarra=r_suma_recargo;
+		LET nvoRecargoBarra=recargo_barra;
 	END IF;
 	
 	LET ret_nro_documento=h_centro_emisor || h_tipo_docto || LPAD(h_nro_factura, 8, '0');
