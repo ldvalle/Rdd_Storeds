@@ -131,7 +131,7 @@ DEFINE ret_hora_pago	char(10);
 
 END PROCEDURE;
 
-GRANT EXECUTE ON rdd_consulta_deuda TO
+GRANT EXECUTE ON rdd_notificacion_pago TO
 superpjp, supersre, supersbl, supersc, corbacho,
 guardt1, fuse,
 ctousu, batchsyn, procbatc, "UCENTRO", "OVIRTUAL",

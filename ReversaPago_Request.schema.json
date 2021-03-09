@@ -22,7 +22,7 @@
             "type": "string",
             "maxLength": 100
         },
-        "monto_pago": {
+        "monto_deuda": {
             "type": "number",
             "multipleOf": 0.01,
             "exclusiveMinimum": 0
