@@ -78,6 +78,8 @@ DEFINE ret_nombre_cliente		char(100);
 DEFINE ret_estado_cliente		char(1);
 DEFINE ret_direccion_sum		char(200);
 
+    SET ISOLATION TO DIRTY READ;
+    
     IF codigo_empresa != 4 THEN
         RETURN '013', 'EMPRESA INVALIDA','', '', 0, '', '', '', '', '', '', '', '', '';
     END IF;

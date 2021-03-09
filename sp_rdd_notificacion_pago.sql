@@ -25,9 +25,9 @@ RETURNING char(3) as codigo_retorno,
 	char(10) as fecha_pago_aplicado,
 	char(10) as hora_pago_aplicado;
 
-DEFINE len_barra			integer;
+DEFINE len_barra			int;
 DEFINE nro_cliente_barra	char(8);
-DEFINE nro_cliente			integer;
+DEFINE iNroCliente			int;
 DEFINE nrows				int;
 DEFINE dFechaRendicion		DATE;
 DEFINE dFechaPagoReca		DATE;
@@ -50,7 +50,7 @@ DEFINE ret_hora_pago	char(10);
 	END IF;
 		
 	LET nro_cliente_barra=codigoBarras[8,15];
-	LET nro_cliente=to_number(nro_cliente_barra);
+	LET iNroCliente=to_number(nro_cliente_barra);
 	LET dFechaRendicion=TO_DATE(fechaRendicion, '%d/%m/%Y');
 	LET dFechaPagoReca=TO_DATE(fechaPagoRecaudador, '%d/%m/%Y');
 	LET nrows=0;
@@ -86,7 +86,7 @@ DEFINE ret_hora_pago	char(10);
 		fecha_pago_enel,
 		hora_pago_enel
 	)VALUES(
-		nro_cliente,
+		iNroCliente,
 		trim(codigoRecaudador),
 		trim(codigoOficinaRecaudador),
 		trim(codigoCajaRecaudador),
@@ -106,7 +106,13 @@ DEFINE ret_hora_pago	char(10);
 		current);
 		
     -- Recuperar Data
-    SELECT 'M' || trim(cod_recaudador) || to_char(fecha_pago_enel, '%Y%m%d') || lpad(id_movimiento, 6, '0'),
+    SELECT 
+		CASE
+			WHEN length(to_char(id_movimiento)) < 6 THEN
+				'M' || trim(cod_recaudador) || to_char(fecha_pago_enel, '%Y%m%d') || lpad(id_movimiento, 6, '0')
+			ELSE
+				'M' || trim(cod_recaudador) || to_char(fecha_pago_enel, '%Y%m%d') || lpad(substr(to_char(id_movimiento), -6), 6, '0')
+		END,    
 		TO_CHAR(fecha_pago_enel, '%d/%m/%Y'), TO_CHAR(hora_pago_enel, '%H:%M:%S')
     INTO ret_transaccion, ret_fecha_pago, ret_hora_pago
     FROM rdd_notificaciones
@@ -120,7 +126,6 @@ DEFINE ret_hora_pago	char(10);
     AND sesion_banco = trim(sesionBanco);		
 		
     --commit work;
-    
     
 	RETURN '0', 'OK', ret_transaccion, ret_fecha_pago, ret_hora_pago;
 

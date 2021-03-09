@@ -1,0 +1,84 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "required": [
+        "id_empresa",
+        "cod_recaudador",
+        "cod_oficina_recaudador",
+        "cod_caja_recaudador",
+        "cod_barra",
+        "numero_comprobante",
+        "fecha_rendicion",
+        "fecha_pago_recaudador",
+        "hora_pago_recaudador",
+        "sesion_bco",
+        "cod_medio_pago"
+    ],
+    "properties": {
+        "id_empresa": {
+            "type": "integer",
+            "minLength": 1,
+            "maxLength": 1
+        },
+        "cod_recaudador": {
+            "type": "string",
+            "maxLength": 20
+        },
+        "cod_oficina_recaudador": {
+            "type": "string",
+            "maxLength": 4
+        },
+        "cod_caja_recaudador": {
+            "type": "string",
+            "maxLength": 4
+        },
+        "cod_barra": {
+            "type": "string",
+            "maxLength": 100
+        },
+        "numero_comprobante": {
+            "type": "string",
+            "maxLength": 25
+        },        
+        "fecha_rendicion": {
+            "type": "string",
+            "maxLength": 10
+        },
+        "fecha_pago_recaudador": {
+            "type": "string",
+            "maxLength": 10
+        },
+        "hora_pago_recaudador": {
+            "type": "string",
+            "maxLength": 10
+        },
+        "sesion_bco": {
+            "type": "string",
+            "maxLength": 25
+        },
+        "cod_medio_pago": {
+            "type": "string",
+            "maxLength": 250
+        },
+        "info_medio_pago1": {
+            "type": "string",
+            "maxLength": 250
+        },
+        "info_medio_pago2": {
+            "type": "string",
+            "maxLength": 250
+        },
+        "info_medio_pago3": {
+            "type": "string",
+            "maxLength": 250
+        },
+        "info_medio_pago4": {
+            "type": "string",
+            "maxLength": 250
+        },
+        "info_medio_pago5": {
+            "type": "string",
+            "maxLength": 250
+        }
+    }
+}

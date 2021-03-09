@@ -3,7 +3,7 @@ drop procedure rdd_existe_deuda;
 CREATE PROCEDURE rdd_existe_deuda(
 tipo_busqueda		char(25),
 valor_busqueda		char(100))
-RETURNING char(3) as codigo_retorno, char(50) as descripcion_retorno;
+RETURNING char(50) as descripcionExiste;
 
 DEFINE numero_suministro 	char(8);
 DEFINE nro_cliente_barra	char(8);
@@ -42,7 +42,7 @@ DEFINE nrows                integer;
         LET descripcion = 'Cliente/Barra no existe';
     END IF;
     
-	RETURN codigo, descripcion;
+	RETURN descripcion;
 
 END PROCEDURE;
 

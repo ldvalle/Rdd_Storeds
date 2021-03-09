@@ -1,0 +1,33 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "required": [
+        "codigo_retorno",
+        "descripcion_retorno",
+		"transaccion_pago_enel",
+		"fecha_pago_aplicado",
+		"hora_pago_aplicado"
+    ],
+    "properties": {
+        "codigo_retorno": {
+            "type": "string",
+            "maxLength": 3
+        },
+        "descripcion_retorno": {
+            "type": "string",
+            "maxLength": 250
+        },
+        "transaccion_pago_enel": {
+            "type": "string",
+            "maxLength": 20
+        },
+        "fecha_pago_aplicado": {
+            "type": "string",
+            "maxLength": 10
+        },
+        "hora_pago_aplicado": {
+            "type": "string",
+            "maxLength": 10
+        }
+    }
+}

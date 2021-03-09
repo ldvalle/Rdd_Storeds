@@ -1,0 +1,35 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "required": [
+        "id_empresa",
+        "cod_recaudador",
+        "cod_barra",
+        "monto_deuda",
+        "transaccion_pago_enel"
+    ],
+    "properties": {
+        "id_empresa": {
+            "type": "integer",
+            "minLength": 1,
+            "maxLength": 1
+        },
+        "cod_recaudador": {
+            "type": "string",
+            "maxLength": 20
+        },
+        "cod_barra": {
+            "type": "string",
+            "maxLength": 100
+        },
+        "monto_pago": {
+            "type": "number",
+            "multipleOf": 0.01,
+            "exclusiveMinimum": 0
+        },
+        "transaccion_pago_enel": {
+            "type": "string",
+            "maxLength": 20
+        }
+    }
+}

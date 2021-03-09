@@ -15,6 +15,8 @@ DEFINE cParte1 	char(1);
 DEFINE sParte2		char(10);
 DEFINE largo2		int;
 
+    SET ISOLATION TO DIRTY READ;
+    
 	LET largo = length(sBarraAux);
 	LET totPar = 0;
 	LET totImp = 0;

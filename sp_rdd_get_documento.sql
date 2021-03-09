@@ -36,6 +36,8 @@ DEFINE nrows				int;
 DEFINE ndias				int;
 DEFINE sNroDocumento		char(12);
 
+    SET ISOLATION TO DIRTY READ;
+    
 	LET empresa_barra=valor_busqueda[1,3];
 	LET sucursal_barra=valor_busqueda[4,5];
 	LET plan_barra=valor_busqueda[6,7];
