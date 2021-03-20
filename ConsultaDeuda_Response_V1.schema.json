@@ -1,0 +1,55 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "required": [
+        "codigo_retorno",
+        "descripcion_retorno",
+        "cod_barra",
+        "tipo_deuda",
+        "monto_deuda",
+        "tipo_documento",
+        "fecha_vencimiento",
+        "fecha_emision"
+    ],
+    "properties": {
+        "codigo_retorno": {
+            "type": "string"
+        },
+        "descripcion_retorno": {
+            "type": "string"
+        },
+        "cod_barra": {
+            "type": "string"
+        },
+        "tipo_deuda": {
+            "type": "string"
+        },
+        "monto_deuda": {
+            "type": "number"
+        },
+        "tipo_documento": {
+            "type": "string"
+        },
+        "fecha_vencimiento": {
+            "type": "string"
+        },
+        "fecha_emision": {
+            "type": "string"
+        },
+        "nombre_cliente": {
+            "type": "string"
+        },
+        "estado_cliente": {
+            "type": "string"
+        },
+        "direccion": {
+            "type": "string"
+        },
+        "mensaje": {
+            "type": "string"
+        },
+        "publicidad": {
+            "type": "string"
+        }
+    }
+}
