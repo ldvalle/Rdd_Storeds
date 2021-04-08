@@ -46,7 +46,7 @@ DEFINE ret_hora_pago	char(10);
 	-- validar la barra
 	LET len_barra= LENGTH(codigoBarras);
 	IF (len_barra != 46) THEN
-		RETURN '105', 'Longitud de barra incorrecto', '', '', '';
+		RETURN '105', 'LONGITUD DE BARRA INCORRECTO', '', '', '';
 	END IF;
 		
 	LET nro_cliente_barra=codigoBarras[8,15];
@@ -60,7 +60,7 @@ DEFINE ret_hora_pago	char(10);
 	AND sesion_banco = trim(sesionBanco);
 	
 	IF nrows > 0 THEN
-		RETURN 'XXX', 'PAGO YA IMPUTADO','', '', '';
+		RETURN '007', 'PAGO YA IMPUTADO','', '', '';
 	END IF;
 	
 	--begin work;

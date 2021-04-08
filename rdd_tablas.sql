@@ -126,3 +126,13 @@ ldvalle, vaz, corbacho, pmf, ctousu, fuse;
 create index inx01rdd_reversa on rdd_reversiones(cod_trans_enel);
 create index inx02rdd_reversa on rdd_reversiones(numero_cliente);
 
+begin work;
+
+INSERT INTO tabla (sucursal, nomtabla, codigo, descripcion, fecha_activacion
+)values('0000', 'RDDECO', '3', 'EstCob Judicial', today);
+INSERT INTO tabla (sucursal, nomtabla, codigo, descripcion, fecha_activacion
+)values('0000', 'RDDECO', '5', 'EstCob Convocatoria', today);
+INSERT INTO tabla (sucursal, nomtabla, codigo, descripcion, fecha_activacion
+)values('0000', 'RDDECO', 'D', 'EstCob Concurso Preventivo', today);
+
+commit work;

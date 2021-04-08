@@ -40,7 +40,7 @@ DEFINE nrows				int;
 	-- validar la barra
 	LET len_barra= LENGTH(codigoBarras);
 	IF (len_barra != 46) THEN
-		RETURN '105', 'Longitud de barra incorrecto';
+		RETURN '105', 'LONGITUD DE BARRA INCORRECTO';
 	END IF;
 		
 	LET nro_cliente_barra=codigoBarras[8,15];
@@ -56,17 +56,17 @@ DEFINE nrows				int;
 	LET nrows = DBINFO('sqlca.sqlerrd2');
 	
 	IF nrows = 0 THEN
-		RETURN 'XXX', 'PAGO NO INGRESADO';
+		RETURN '016', 'PAGO NO INGRESADO';
 	END IF;
 	
 	-- Valido el monto
 	IF nMontoImputado != montoPago THEN
-		RETURN 'XXX', 'MONTO REVERSION NO COINCIDE CON MONTO DEL PAGO';
+		RETURN '016', 'MONTO REVERSION NO COINCIDE CON MONTO DEL PAGO';
 	END IF;
 	
 	-- valido las codigoBarras
 	IF trim(codigoBarras) != trim(barraPago) THEN
-		RETURN 'XXX', 'LAS BARRAS DE PAGO Y REVERSION NO COINCIDEN';
+		RETURN '016', 'LAS BARRAS DE PAGO Y REVERSION NO COINCIDEN';
 	END IF;
 		
 	-- Valido Reversion preexistente
@@ -76,7 +76,7 @@ DEFINE nrows				int;
 	WHERE cod_trans_enel = trim(trxPago);
 	
 	IF nrows > 0 THEN
-		RETURN 'XXX', 'REVERSION INGRESADA ANTERIORMENTE';
+		RETURN '009', 'TRANSACCION YA REVERSADA';
 	END IF;
 	
 	--begin work;

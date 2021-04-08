@@ -75,7 +75,7 @@ DEFINE aux_fecha_vencimiento	char(10);
 		-- validar la barra
 		LET len_barra= LENGTH(valor_busqueda);
 		IF (len_barra != 46) THEN
-			RETURN '105', 'Longitud de barra incorrecto';
+			RETURN '105', 'LONGITUD DE BARRA INCORRECTO';
 		END IF;
 		
 		LET empresa_barra=valor_busqueda[1,3];
@@ -104,7 +104,7 @@ DEFINE aux_fecha_vencimiento	char(10);
 			IF (tipo_mov_barra != '06') THEN
 				IF (tipo_mov_barra != '10') THEN
 					IF (tipo_mov_barra != '96') THEN
-						RETURN '105', 'Tipo de barra incorrecto';
+						RETURN '105', 'LONGITUD DE BARRA INCORRECTO';
 					END IF;
 				END IF;
 			END IF;
@@ -115,7 +115,7 @@ DEFINE aux_fecha_vencimiento	char(10);
 		EXECUTE PROCEDURE sp_rdd_devuelve_dv(barra_aux1) INTO dv_barra_aux1;
 		
 		IF dv_barra != dv_barra_aux1 THEN
-			RETURN '105', 'Digito Verificador de barra incorrecto';
+			RETURN '105', 'DIGITO VERIFICADOR DE BARRA INCORRECTO';
 		END IF;
 		LET aux_tipo_documento=tipo_mov_barra;
 	ELSE
@@ -145,13 +145,13 @@ DEFINE aux_fecha_vencimiento	char(10);
 
 	LET nrows = DBINFO('sqlca.sqlerrd2');
 	IF nrows = 0 THEN
-		RETURN '003', 'Cliente/Barra no existe.';
+		RETURN '003', 'CLIENTE/BARRA NO EXISTE';
 	END IF;
 	
     IF trim(tipo_busqueda) = 'cod_barra' THEN
         IF tipo_mov_barra = '06' OR tipo_mov_barra = '96' THEN
             IF barra_corr_factu != cli_corr_factu THEN
-                RETURN '021', 'CLIENTE COMUNICARSE CON ATE.COMERCIAL ENEL';
+                RETURN '021', 'ESTIMADO CLIENTE FAVOR DE COMUNICARSE CON ATE.COMERCIAL ENEL';
             END IF;
         END IF;
     END IF;
@@ -163,16 +163,26 @@ DEFINE aux_fecha_vencimiento	char(10);
 	
 	-- ver el tipo cliente
 	IF cli_tipo_cliente = 'OM' THEN
-		RETURN '021', 'CLIENTE COMUNICARSE CON ATE.COMERCIAL ENEL';
+		RETURN '021', 'ESTIMADO CLIENTE FAVOR DE COMUNICARSE CON ATE.COMERCIAL ENEL';
 	ELIF cli_tipo_cliente = 'OP' THEN
-		RETURN '021', 'CLIENTE COMUNICARSE CON ATE.COMERCIAL ENEL';
+		RETURN '021', 'ESTIMADO CLIENTE FAVOR DE COMUNICARSE CON ATE.COMERCIAL ENEL';
 	ELIF cli_tipo_cliente = 'ON' THEN
-		RETURN '021', 'CLIENTE COMUNICARSE CON ATE.COMERCIAL ENEL';
+		RETURN '021', 'ESTIMADO CLIENTE FAVOR DE COMUNICARSE CON ATE.COMERCIAL ENEL';
 	ELIF cli_tipo_cliente = 'AP' THEN
-		RETURN '021', 'CLIENTE COMUNICARSE CON ATE.COMERCIAL ENEL';
+		RETURN '021', 'ESTIMADO CLIENTE FAVOR DE COMUNICARSE CON ATE.COMERCIAL ENEL';
 	END IF;	
 	
 	-- Ver lo del estado de cobrabilidad
+    SELECT COUNT(*) INTO nrows FROM tabla
+    WHERE nomtabla = 'RDDECO'
+    AND sucursal = '0000'
+    AND codigo = cli_est_cob
+    AND fecha_activacion <= TODAY
+    AND (fecha_desactivac IS NULL OR fecha_desactivac > TODAY);
+    
+    IF nrows > 0 THEN
+        RETURN '021', 'ESTIMADO CLIENTE FAVOR DE COMUNICARSE CON ATE.COMERCIAL ENEL';
+    END IF;
 	
 	IF trim(tipo_busqueda) = 'nro_suministro' THEN
 		-- en este caso tengo que levantar la ultima factura.
@@ -205,7 +215,7 @@ DEFINE aux_fecha_vencimiento	char(10);
 	END IF;
 	
     IF aux_monto_deuda > tope_recauda THEN
-        RETURN '021', 'CLIENTE COMUNICARSE CON ATE.COMERCIAL ENEL';
+        RETURN '021', 'ESTIMADO CLIENTE FAVOR DE COMUNICARSE CON ATE.COMERCIAL ENEL';
     END IF;
 
 	RETURN '0', 'OK';
