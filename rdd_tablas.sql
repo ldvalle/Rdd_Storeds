@@ -95,8 +95,8 @@ numero_cliente	int,
 cod_recaudador	char(20),
 cod_barra		char(100),
 monto_deuda		decimal(14,6),
-fecha_acuse			datetime hour to second,
-fecha_procesado_mac	datetime hour to second
+fecha_acuse			datetime year to second,
+fecha_procesado_mac	datetime year to second
 );
 
 GRANT select ON rdd_reversiones  TO
@@ -134,5 +134,11 @@ INSERT INTO tabla (sucursal, nomtabla, codigo, descripcion, fecha_activacion
 )values('0000', 'RDDECO', '5', 'EstCob Convocatoria', today);
 INSERT INTO tabla (sucursal, nomtabla, codigo, descripcion, fecha_activacion
 )values('0000', 'RDDECO', 'D', 'EstCob Concurso Preventivo', today);
+
+insert into tabla (sucursal, nomtabla, codigo, descripcion, fecha_activacion)
+select s.sucursal, 'MOTREF', '51', 'REVERSA PAGO', today from sucur s;
+
+INSERT INTO tabla (sucursal, nomtabla, codigo, descripcion, valor_alf, fecha_activacion
+)values('0000', 'PATH', 'RDDREV', 'Path reversas rdd', '/synergia/mac/arch/prod/RDD/EXT/reversas/',today);
 
 commit work;
