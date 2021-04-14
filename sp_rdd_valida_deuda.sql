@@ -52,6 +52,7 @@ DEFINE nrows				int;
 DEFINE cod_gd				char(3);
 DEFINE descri_gd			char(100);
 DEFINE tope_recauda         decimal(12,2);
+DEFINE fechaTope            date;
 
 -- Valores a recuperar
 DEFINE aux_cod_barra 	char(46);
@@ -73,6 +74,13 @@ DEFINE aux_fecha_vencimiento	char(10);
 		
 	ELIF trim(tipo_busqueda) = 'cod_barra' THEN
 		-- validar la barra
+        SELECT TODAY - valor INTO fechaTope FROM tabla 
+        WHERE nomtabla = 'RDDIAS'
+        AND codigo = '1'
+        AND sucursal = '0000'
+        AND fecha_activacion <= TODAY
+        AND (fecha_desactivac IS NULL OR fecha_desactivac > TODAY);
+        
 		LET len_barra= LENGTH(valor_busqueda);
 		IF (len_barra != 46) THEN
 			RETURN '105', 'LONGITUD DE BARRA INCORRECTO';
@@ -110,6 +118,9 @@ DEFINE aux_fecha_vencimiento	char(10);
 			END IF;
 		END IF;
 	
+        IF (dFechaVcto1 < fechaTope) THEN
+            RETURN '021', 'ESTIMADO CLIENTE FAVOR DE COMUNICARSE CON ATE.COMERCIAL ENEL';
+        END IF;
         
 		LET barra_aux1=valor_busqueda[1,45];
 		EXECUTE PROCEDURE sp_rdd_devuelve_dv(barra_aux1) INTO dv_barra_aux1;
@@ -218,7 +229,7 @@ DEFINE aux_fecha_vencimiento	char(10);
         RETURN '021', 'ESTIMADO CLIENTE FAVOR DE COMUNICARSE CON ATE.COMERCIAL ENEL';
     END IF;
 
-	RETURN '0', 'OK';
+	RETURN '000', 'OK';
 		
 END PROCEDURE;
 

@@ -108,10 +108,10 @@ DEFINE ret_hora_pago	char(10);
     -- Recuperar Data
     SELECT 
 		CASE
-			WHEN length(to_char(id_movimiento)) < 6 THEN
-				'M' || trim(cod_recaudador) || to_char(fecha_pago_enel, '%Y%m%d') || lpad(id_movimiento, 6, '0')
+			WHEN length(to_char(id_movimiento)) < 9 THEN
+				'M' || trim(cod_recaudador) || to_char(fecha_pago_enel, '%y%m%d') || lpad(id_movimiento, 9, '0')
 			ELSE
-				'M' || trim(cod_recaudador) || to_char(fecha_pago_enel, '%Y%m%d') || lpad(substr(to_char(id_movimiento), -6), 6, '0')
+				'M' || trim(cod_recaudador) || to_char(fecha_pago_enel, '%y%m%d') || lpad(substr(to_char(id_movimiento), -9), 9, '0')
 		END,    
 		TO_CHAR(fecha_pago_enel, '%d/%m/%Y'), TO_CHAR(hora_pago_enel, '%H:%M:%S')
     INTO ret_transaccion, ret_fecha_pago, ret_hora_pago
@@ -127,7 +127,7 @@ DEFINE ret_hora_pago	char(10);
 		
     --commit work;
     
-	RETURN '0', 'OK', ret_transaccion, ret_fecha_pago, ret_hora_pago;
+	RETURN '000', 'OK', ret_transaccion, ret_fecha_pago, ret_hora_pago;
 
 END PROCEDURE;
 

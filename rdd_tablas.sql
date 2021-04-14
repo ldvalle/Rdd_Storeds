@@ -141,4 +141,7 @@ select s.sucursal, 'MOTREF', '51', 'REVERSA PAGO', today from sucur s;
 INSERT INTO tabla (sucursal, nomtabla, codigo, descripcion, valor_alf, fecha_activacion
 )values('0000', 'PATH', 'RDDREV', 'Path reversas rdd', '/synergia/mac/arch/prod/RDD/EXT/reversas/',today);
 
+INSERT INTO tabla (sucursal, nomtabla, codigo, descripcion, valor, fecha_activacion
+)values('0000', 'RDDIAS', '1', 'Antig.Vencto.1', 90, today);
+
 commit work;
