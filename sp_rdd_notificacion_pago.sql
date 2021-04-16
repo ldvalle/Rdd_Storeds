@@ -55,12 +55,15 @@ DEFINE ret_hora_pago	char(10);
 	LET dFechaPagoReca=TO_DATE(fechaPagoRecaudador, '%d/%m/%Y');
 	LET nrows=0;
 	
-	SELECT count(*) INTO nrows FROM rdd_notificaciones
+	SELECT cod_trans_enel, to_char(fecha_pago_enel, '%d/%m/%Y'), to_char(hora_pago_enel, '%H:%M:%S') 
+        INTO ret_transaccion, ret_fecha_pago, ret_hora_pago  
+    FROM rdd_notificaciones
 	WHERE nro_comprobante_reca = trim(numeroComprobante)
 	AND sesion_banco = trim(sesionBanco);
 	
+    LET nrows = DBINFO('sqlca.sqlerrd2');
 	IF nrows > 0 THEN
-		RETURN '007', 'PAGO YA IMPUTADO','', '', '';
+		RETURN '007', 'PAGO YA IMPUTADO', ret_transaccion, ret_fecha_pago, ret_hora_pago;
 	END IF;
 	
 	--begin work;
@@ -109,9 +112,9 @@ DEFINE ret_hora_pago	char(10);
     SELECT 
 		CASE
 			WHEN length(to_char(id_movimiento)) < 9 THEN
-				'M' || trim(cod_recaudador) || to_char(fecha_pago_enel, '%y%m%d') || lpad(id_movimiento, 9, '0')
+				'M' || trim(cod_recaudador) || to_char(dFechaPagoReca, '%y%m%d') || lpad(id_movimiento, 9, '0')
 			ELSE
-				'M' || trim(cod_recaudador) || to_char(fecha_pago_enel, '%y%m%d') || lpad(substr(to_char(id_movimiento), -9), 9, '0')
+				'M' || trim(cod_recaudador) || to_char(dFechaPagoReca, '%y%m%d') || lpad(substr(to_char(id_movimiento), -9), 9, '0')
 		END,    
 		TO_CHAR(fecha_pago_enel, '%d/%m/%Y'), TO_CHAR(hora_pago_enel, '%H:%M:%S')
     INTO ret_transaccion, ret_fecha_pago, ret_hora_pago

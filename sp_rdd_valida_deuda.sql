@@ -198,12 +198,21 @@ DEFINE aux_fecha_vencimiento	char(10);
 	IF trim(tipo_busqueda) = 'nro_suministro' THEN
 		-- en este caso tengo que levantar la ultima factura.
 		EXECUTE PROCEDURE rdd_get_ultifactu(nro_cliente) INTO aux_cod_barra, aux_monto_deuda, aux_nro_documento, aux_fecha_emision, aux_fecha_vencimiento;
+
+        IF aux_monto_deuda = 0 THEN
+            RETURN '005', 'SIN DEUDA VIGENTE.';
+        END IF;
 		
 		LET aux_tipo_deuda='UF';
 		LET aux_tipo_documento=aux_cod_barra[44,45];
+
 	ELSE
 		-- en este caso, tengo que recuperar el documento origen de la barra.
 		EXECUTE PROCEDURE rdd_get_documento(valor_busqueda) INTO cod_gd, descri_gd, aux_monto_deuda, aux_nro_documento, aux_fecha_emision, aux_fecha_vencimiento;
+
+        IF aux_monto_deuda = 0 THEN
+            RETURN '005', 'SIN DEUDA VIGENTE.';
+        END IF;
 		
 		IF cod_gd != '0' THEN
 			RETURN cod_gd, descri_gd;
