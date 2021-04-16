@@ -97,12 +97,16 @@ DEFINE aux_fecha_vencimiento	char(10);
 		LET corr_factu_barra=valor_busqueda[41,43];
 		LET tipo_mov_barra=valor_busqueda[44,45];
 		LET dv_barra=valor_busqueda[46,46];
-
-		LET sFechaVcto2=valor_busqueda[25,26] || valor_busqueda[37,40]; 
-		
+        
 		LET nro_cliente = TO_NUMBER(nro_cliente_barra);
 		LET dFechaVcto1=TO_DATE(vcto1_barra, '%y%m%d');
-		LET dFechaVcto2=TO_DATE(sFechaVcto2, '%y%m%d');
+        
+        IF vcto2_barra != '0000' THEN
+            LET sFechaVcto2=valor_busqueda[25,26] || valor_busqueda[37,40];
+            LET dFechaVcto2=TO_DATE(sFechaVcto2, '%y%m%d');
+        ELSE
+            LET dFechaVcto2=dFechaVcto1;
+        END IF;
 		
 		LET fMonto = (TO_NUMBER(importe_barra)/100);
 		LET fRecargo = (TO_NUMBER(recargo_barra)/100);
@@ -112,7 +116,7 @@ DEFINE aux_fecha_vencimiento	char(10);
 			IF (tipo_mov_barra != '06') THEN
 				IF (tipo_mov_barra != '10') THEN
 					IF (tipo_mov_barra != '96') THEN
-						RETURN '105', 'LONGITUD DE BARRA INCORRECTO';
+						RETURN '105', 'TIPO DE BARRA INVALIDA';
 					END IF;
 				END IF;
 			END IF;
