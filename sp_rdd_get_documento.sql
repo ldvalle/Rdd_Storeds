@@ -78,7 +78,7 @@ DEFINE sNroDocumento		char(12);
 
 		LET nrows = DBINFO('sqlca.sqlerrd2');
 		IF nrows=0 THEN
-			RETURN '1', 'Cliente no tiene convenio vigente', 0, '', '', '';
+			RETURN '110', 'Cliente no tiene convenio vigente', 0, '', '', '';
 		END IF;
 		
 		LET ret_monto_deuda=fMonto;
@@ -96,7 +96,7 @@ DEFINE sNroDocumento		char(12);
 		
 		LET nrows = DBINFO('sqlca.sqlerrd2');
 		IF nrows=0 THEN
-			RETURN '1', 'No se encuentra factura asociada a la barra.', 0, '', '', '';
+			RETURN '111', 'No se encuentra factura asociada a la barra.', 0, '', '', '';
 		END IF;	
 		
 		LET ret_fecha_emision=to_char(dFecha_emision, '%d/%m/%Y');
@@ -111,8 +111,8 @@ DEFINE sNroDocumento		char(12);
 		END IF;
 		
 		
-	ELIF tipo_mov_barra = '10' THEN
-		-- pvd
+	ELIF tipo_mov_barra = '10' OR tipo_mov_barra = '45' THEN
+		-- pvd ó pcp
 		
 		SELECT round(valor,0) INTO ndias
 		FROM tabla
@@ -131,14 +131,14 @@ DEFINE sNroDocumento		char(12);
 		INTO sNroDocumento, dFecha_emision
 		FROM log_comprob l1
 		WHERE l1.numero_cliente = nro_cliente
-		AND l1.tipo_comprob = '10'
+		AND l1.tipo_comprob = tipo_mov_barra
 		AND l1.nro_comprob = icorrelativo
 		AND l1.monto_comprob = fMonto
 		AND l1.fecha_anulacion IS NULL
 		AND l1.fecha_pago IS NULL
 		AND l1.fecha_emision = (SELECT MAX(l2.fecha_emision) FROM log_comprob l2
 				WHERE l2.numero_cliente = l1.numero_cliente
-				AND l2.tipo_comprob = '10'
+				AND l2.tipo_comprob = tipo_mov_barra
 				AND l2.nro_comprob = l1.nro_comprob
 				AND l2.monto_comprob = l1.monto_comprob
 				AND l2.fecha_anulacion IS NULL
@@ -147,7 +147,7 @@ DEFINE sNroDocumento		char(12);
 
 		LET nrows = DBINFO('sqlca.sqlerrd2');
 		IF nrows=0 THEN
-			RETURN '1', 'No se encuentra documento asociado a la barra.', 0, '', '', '';
+			RETURN '112', 'No se encuentra documento asociado a la barra.', 0, '', '', '';
 		END IF;
 				
 		LET ret_monto_deuda=fMonto;
