@@ -74,11 +74,11 @@ DEFINE sNroDocumento		char(12);
 		FROM conve
 		WHERE numero_cliente = nro_cliente
 		AND corr_convenio = icorrelativo
-		AND estado = 'V';
+		AND estado = 'S';
 
 		LET nrows = DBINFO('sqlca.sqlerrd2');
 		IF nrows=0 THEN
-			RETURN '110', 'Cliente no tiene convenio vigente', 0, '', '', '';
+			RETURN '110', 'Cliente no tiene convenio solicitado', 0, '', '', '';
 		END IF;
 		
 		LET ret_monto_deuda=fMonto;
