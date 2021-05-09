@@ -73,7 +73,7 @@ DEFINE sNroDocumento		char(12);
 		SELECT fecha_creacion, fecha_vto_1 INTO dFecha_emision, dFechaVcto1
 		FROM conve
 		WHERE numero_cliente = nro_cliente
-		AND corr_convenio = icorrelativo
+		AND nro_docto = icorrelativo
 		AND estado = 'S';
 
 		LET nrows = DBINFO('sqlca.sqlerrd2');
