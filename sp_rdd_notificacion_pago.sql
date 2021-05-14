@@ -37,7 +37,15 @@ DEFINE ret_transaccion 	char(20);
 DEFINE ret_fecha_pago	char(10);
 DEFINE ret_hora_pago	char(10);
 
-    SET ISOLATION TO DIRTY READ;
+DEFINE sql_err              INTEGER;
+DEFINE isam_err             INTEGER;
+DEFINE error_info           char(100);
+
+    ON EXCEPTION SET sql_err, isam_err, error_info
+        RETURN '199', 'rdd_notificacion_pago. sqlErr '  || to_char(sql_err) || ' isamErr ' || to_char(isam_err) || ' ' || error_info,'', '', '';
+    END EXCEPTION;
+
+    SET LOCK MODE TO WAIT 15;
     
     IF codigo_empresa != 4 THEN
         RETURN '013', 'EMPRESA INVALIDA','', '', '';
