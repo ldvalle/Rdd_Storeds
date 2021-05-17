@@ -153,7 +153,7 @@ DEFINE sNroDocumento		char(12);
 		LET ret_monto_deuda=fMonto;
 		LET ret_nro_documento= sNroDocumento;
 		LET ret_fecha_emision=to_char(dFecha_emision, '%d/%m/%Y');
-		LET ret_fecha_vencimiento=to_char(dFecha_actual, '%d/%m/%Y');
+        LET ret_fecha_vencimiento=to_char(dFechaVcto1, '%d/%m/%Y');
 		
 	ELSE
 		RETURN '105', 'Tipo de barra invalida', 0, '', '', '';
