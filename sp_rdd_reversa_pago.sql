@@ -58,7 +58,8 @@ DEFINE error_info           char(100);
 	LET nrows=0;
 	
 	SELECT to_number(info_medio_pago1), cod_barra INTO nMontoImputado, barraPago FROM rdd_notificaciones
-	WHERE cod_trans_enel = trim(trxPago);
+	WHERE cod_trans_enel = trim(trxPago)
+    AND estado = 'N';
 	
 	LET nrows = DBINFO('sqlca.sqlerrd2');
 	
@@ -88,7 +89,7 @@ DEFINE error_info           char(100);
 	
 	--begin work;
     
-    -- Insertar
+    -- Insertar reversion
     INSERT INTO rdd_reversiones(
 		cod_trans_enel,
 		numero_cliente,
@@ -104,6 +105,12 @@ DEFINE error_info           char(100);
 		montoPago,
 		CURRENT);
 		
+    -- Actualizar la notificacion
+    UPDATE rdd_notificaciones SET
+    estado = 'A'        
+	WHERE cod_trans_enel = trim(trxPago)
+    AND estado = 'N';
+        
     --commit work;
     
 	RETURN '000', 'OK';

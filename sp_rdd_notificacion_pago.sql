@@ -67,7 +67,8 @@ DEFINE error_info           char(100);
         INTO ret_transaccion, ret_fecha_pago, ret_hora_pago  
     FROM rdd_notificaciones
 	WHERE nro_comprobante_reca = trim(numeroComprobante)
-	AND sesion_banco = trim(sesionBanco);
+	AND sesion_banco = trim(sesionBanco)
+    AND estado = 'N';
 	
     LET nrows = DBINFO('sqlca.sqlerrd2');
 	IF nrows > 0 THEN
@@ -95,7 +96,8 @@ DEFINE error_info           char(100);
 		info_medio_pago4,
 		info_medio_pago5,
 		fecha_pago_enel,
-		hora_pago_enel
+		hora_pago_enel,
+        estado
 	)VALUES(
 		iNroCliente,
 		trim(codigoRecaudador),
@@ -114,7 +116,8 @@ DEFINE error_info           char(100);
 		trim(infoMedioPago4),
 		trim(infoMedioPago5),
 		TODAY,
-		current);
+		current,
+        'N');
 		
     -- Recuperar Data
     SELECT 
@@ -127,14 +130,18 @@ DEFINE error_info           char(100);
 		TO_CHAR(fecha_pago_enel, '%d/%m/%Y'), TO_CHAR(hora_pago_enel, '%H:%M:%S')
     INTO ret_transaccion, ret_fecha_pago, ret_hora_pago
     FROM rdd_notificaciones
-    WHERE nro_comprobante_reca = trim(numeroComprobante)
-    AND sesion_banco = trim(sesionBanco);
+    WHERE cod_recaudador = trim(codigoRecaudador)
+    AND nro_comprobante_reca = trim(numeroComprobante)
+    AND sesion_banco = trim(sesionBanco)
+    AND estado = 'N';
     
     -- Updatear
     UPDATE rdd_notificaciones SET
 		cod_trans_enel= ret_transaccion
-    WHERE nro_comprobante_reca = trim(numeroComprobante)
-    AND sesion_banco = trim(sesionBanco);		
+    WHERE cod_recaudador = trim(codigoRecaudador)
+    AND nro_comprobante_reca = trim(numeroComprobante)
+    AND sesion_banco = trim(sesionBanco)
+    AND estado = 'N';
 		
     --commit work;
     

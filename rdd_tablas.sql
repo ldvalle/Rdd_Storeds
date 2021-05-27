@@ -55,7 +55,8 @@ info_medio_pago5		char(250),
 cod_trans_enel			char(20),
 fecha_pago_enel			date,
 hora_pago_enel			datetime hour to second,
-fecha_procesado_mac		datetime hour to second
+fecha_procesado_mac		datetime hour to second,
+estado                  char(1) default 'N'
 );
 
 create unique index inx01rdd_notifica on rdd_notificaciones(id_movimiento);
