@@ -107,7 +107,7 @@ DEFINE sNroDocumento		char(12);
 			LET ret_fecha_vencimiento=to_char(dFechaVcto2, '%d/%m/%Y');
 		ELSE
 			LET ret_monto_deuda=fMonto;
-			LET ret_fecha_vencimiento=to_char(dFechaVcto2, '%d/%m/%Y');		
+			LET ret_fecha_vencimiento=to_char(dFechaVcto1, '%d/%m/%Y');		
 		END IF;
 		
 		
