@@ -31,6 +31,7 @@ DEFINE iNroCliente			int;
 DEFINE nrows				int;
 DEFINE dFechaRendicion		DATE;
 DEFINE dFechaPagoReca		DATE;
+DEFINE idMovimNoti          int;
 
 -- Valores a devolver
 DEFINE ret_transaccion 	char(20);
@@ -41,10 +42,11 @@ DEFINE sql_err              INTEGER;
 DEFINE isam_err             INTEGER;
 DEFINE error_info           char(100);
 
+{
     ON EXCEPTION SET sql_err, isam_err, error_info
         RETURN '199', 'rdd_notificacion_pago. sqlErr '  || to_char(sql_err) || ' isamErr ' || to_char(isam_err) || ' ' || error_info,'', '', '';
     END EXCEPTION;
-
+}
     SET LOCK MODE TO WAIT 15;
     
     IF codigo_empresa != 4 THEN
@@ -68,6 +70,7 @@ DEFINE error_info           char(100);
     FROM rdd_notificaciones
 	WHERE nro_comprobante_reca = trim(numeroComprobante)
 	AND sesion_banco = trim(sesionBanco)
+    AND cod_recaudador = trim(codigoRecaudador) 
     AND estado = 'N';
 	
     LET nrows = DBINFO('sqlca.sqlerrd2');
@@ -75,8 +78,6 @@ DEFINE error_info           char(100);
 		RETURN '007', 'PAGO YA IMPUTADO', ret_transaccion, ret_fecha_pago, ret_hora_pago;
 	END IF;
 	
-	--begin work;
-    
     -- Insertar
 	INSERT INTO rdd_notificaciones(
 		numero_cliente,
@@ -120,7 +121,7 @@ DEFINE error_info           char(100);
         'N');
 		
     -- Recuperar Data
-    SELECT 
+    SELECT  id_movimiento,
 		CASE
 			WHEN length(to_char(id_movimiento)) < 9 THEN
 				'M' || trim(cod_recaudador) || to_char(dFechaPagoReca, '%y%m%d') || lpad(id_movimiento, 9, '0')
@@ -128,7 +129,7 @@ DEFINE error_info           char(100);
 				'M' || trim(cod_recaudador) || to_char(dFechaPagoReca, '%y%m%d') || lpad(substr(to_char(id_movimiento), -9), 9, '0')
 		END,    
 		TO_CHAR(fecha_pago_enel, '%d/%m/%Y'), TO_CHAR(hora_pago_enel, '%H:%M:%S')
-    INTO ret_transaccion, ret_fecha_pago, ret_hora_pago
+    INTO idMovimNoti, ret_transaccion, ret_fecha_pago, ret_hora_pago
     FROM rdd_notificaciones
     WHERE cod_recaudador = trim(codigoRecaudador)
     AND nro_comprobante_reca = trim(numeroComprobante)
@@ -138,13 +139,8 @@ DEFINE error_info           char(100);
     -- Updatear
     UPDATE rdd_notificaciones SET
 		cod_trans_enel= ret_transaccion
-    WHERE cod_recaudador = trim(codigoRecaudador)
-    AND nro_comprobante_reca = trim(numeroComprobante)
-    AND sesion_banco = trim(sesionBanco)
-    AND estado = 'N';
+    WHERE id_movimiento = idMovimNoti; 
 		
-    --commit work;
-    
 	RETURN '000', 'OK', ret_transaccion, ret_fecha_pago, ret_hora_pago;
 
 END PROCEDURE;
