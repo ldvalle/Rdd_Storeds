@@ -150,7 +150,7 @@ DEFINE ret_direccion_sum		char(200);
 	SET ISOLATION TO DIRTY READ;
 	    
 	-- ver que el cliente exista
-	SELECT c.nombre, c.estado_cliente, c.tipo_cliente, c.estado_cobrabilida, c.corr_facturacion, c.tipo_fpago,
+	SELECT lpad(c.numero_cliente, 10, '0') || ' ' || c.nombre, c.estado_cliente, c.tipo_cliente, c.estado_cobrabilida, c.corr_facturacion, c.tipo_fpago,
 	(saldo_actual+saldo_int_acum+saldo_imp_suj_int+saldo_imp_no_suj_i-valor_anticipo),
 	trim(c.nom_calle), trim(c.nro_dir), nvl(c.piso_dir, ' '), nvl(c.depto_dir, ' '), trim(c.nom_partido), trim(c.nom_comuna)
 	INTO
